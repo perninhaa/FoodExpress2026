@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodExpress | Gastronomia de Elite</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="top-status-bar">
+    <div class="container top-status-content">
+      <span class="live-pulse"></span>
+      <span>Cozinha aberta em tempo real • Entrega média em <strong>25–35 min</strong></span>
+      <span class="status-separator">|</span>
+      <span>Cupom: <strong>PRIMEIRACOMPRA</strong> (15% OFF)</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="container nav">
+      <div class="brand" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">Food<span>Express</span></div>
+      </div>
+
+      <nav class="nav-center">
+        <a href="#inicio">Início</a>
+        <a href="#cardapio">Cardápio</a>
+        <a href="#restaurantes">Restaurantes VIP</a>
+        <a href="javascript:void(0)" onclick="openOrdersModal()">Meus Pedidos</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="audioToggleBtn" onclick="toggleAudio()" title="Efeitos Sonoros">🔊</button>
+        <button class="icon-btn" onclick="toggleTheme()" title="Trocar Tema">🌓</button>
+        <button class="icon-btn" onclick="toggleFavFilter()" title="Favoritos">❤️ <span class="badge-count" id="favBadge">0</span></button>
+        <button class="btn btn-glow" onclick="openCart()">
+          <span>🛒 Carrinho</span>
+          <span class="badge-count cart-count" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="container hero-grid">
+        <div>
+          <div class="pill-highlight"><span>✨</span> GASTRONOMIA DE ALTA VELOCIDADE</div>
+          <h1>O sabor dos melhores chefs, <span>entregue na sua porta.</span></h1>
+          <p>Pratos artesanais com adicionais exclusivos, preenchimento inteligente de endereço e entrega expressa.</p>
+
+          <div class="hero-actions">
+            <a href="#cardapio" class="btn btn-glow hero-main-button">Fazer Pedido Agora →</a>
+            <button class="btn hero-coupon-button" onclick="quickApplyCoupon('PRIMEIRACOMPRA')">🎟️ Ativar Cupom 15% OFF</button>
+          </div>
+        </div>
+
+        <div class="hero-card-spotlight" onclick="openProductCustomizer(1)">
+          <div class="spotlight-img-box">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900" alt="Burger">
+            <div class="floating-mini-card">
+              <div>
+                <strong>Burger Angus Supreme</strong>
+                <span>⭐ 4.9 (Toque para personalizar)</span>
+              </div>
+              <strong class="spotlight-price">R$ 29,90</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container search-section">
+      <div class="search-capsule">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="O que você deseja saborear hoje? (Ex: Burger, Pizza, Sushi...)" oninput="handleSearch(this.value)">
+      </div>
+      <div class="categories-bar" id="categoryBar"></div>
+    </div>
+
+    <div class="container">
+      <div class="promo-glass-banner">
+        <div>
+          <span class="promo-label">OFERTA EXCLUSIVA</span>
+          <h2>Ganhe 15% OFF no seu primeiro pedido!</h2>
+          <p>Use o código no carrinho ou clique direto na etiqueta:</p>
+          <div class="coupon-chip" onclick="quickApplyCoupon('PRIMEIRACOMPRA')">
+            <span>🎟️ Cupom:</span>
+            <span>PRIMEIRACOMPRA</span>
+            <span class="coupon-hint">Clique para ativar</span>
+          </div>
+        </div>
+        <div class="promo-emoji">🍕</div>
+      </div>
+    </div>
+
+    <section class="section" id="cardapio">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2>Menu de Destaques</h2>
+            <p>Clique em qualquer prato para personalizar adicionais e observações.</p>
+          </div>
+          <div class="filter-actions">
+            <button class="btn secondary-button" onclick="filterDiet('veg')">🌱 Vegetarianos</button>
+            <button class="btn secondary-button" onclick="resetAllFilters()">Mostrar Todos</button>
+          </div>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+      </div>
+    </section>
+
+    <section class="section restaurants-section" id="restaurantes">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2>Restaurantes Parceiros VIP</h2>
+            <p>Cozinhas renomadas operando com rigor de qualidade e entrega expressa.</p>
+          </div>
+        </div>
+        <div class="product-grid" id="restaurantGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Personalização do produto -->
+  <div class="modal-backdrop" id="customizerModal">
+    <div class="modal-window">
+      <button class="icon-btn modal-close" onclick="closeCustomizerModal()">✕</button>
+
+      <div class="customizer-image">
+        <img id="custImg" src="" alt="Produto selecionado">
+      </div>
+
+      <h2 id="custName" class="customizer-title">Nome do Prato</h2>
+      <p id="custDesc" class="customizer-description"></p>
+
+      <strong class="addons-title">Turbinar com Adicionais:</strong>
+      <div class="customizer-box" id="custAddonsBox"></div>
+
+      <div class="form-group observations-group">
+        <label>Observações para o Chef:</label>
+        <textarea id="custObservations" class="form-input" rows="2" placeholder="Ex: Tirar cebola, carne ao ponto, maionese à parte..."></textarea>
+      </div>
+
+      <div class="customizer-footer">
+        <div class="quantity-control">
+          <button class="icon-btn" onclick="adjustCustQty(-1)">−</button>
+          <strong id="custQtyNum">1</strong>
+          <button class="icon-btn" onclick="adjustCustQty(1)">+</button>
+        </div>
+
+        <button class="btn btn-glow" onclick="confirmAddToCartFromCustomizer()">
+          Adicionar • <span id="custTotalBtn">R$ 0,00</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrinho -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeAllDrawers()"></div>
+
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="drawer-head">
+      <h2><span>🛒</span> Meu Carrinho</h2>
+      <button class="icon-btn" onclick="closeAllDrawers()">✕</button>
+    </div>
+
+    <div class="cart-progress-bar">
+      <div class="progress-labels">
+        <span id="freeShipLabel">Faltam R$ 50,00 para Frete Grátis!</span>
+        <span id="freeShipPercent">0%</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" id="freeShipFill"></div>
+      </div>
+    </div>
+
+    <div class="drawer-body" id="cartItemsList"></div>
+
+    <div class="drawer-foot">
+      <div class="coupon-input-row">
+        <input type="text" id="couponCodeInput" class="form-input" placeholder="CUPOM (ex: PRIMEIRACOMPRA)">
+        <button class="btn btn-glow" onclick="applyCouponInput()">Aplicar</button>
+      </div>
+
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <strong id="cartSubtotal">R$ 0,00</strong>
+      </div>
+
+      <div class="summary-row discount-row" id="cartDiscountRow">
+        <span>Desconto Cupom</span>
+        <strong id="cartDiscountAmount">- R$ 0,00</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Taxa de Entrega</span>
+        <strong id="cartDeliveryFee">R$ 6,00</strong>
+      </div>
+
+      <div class="summary-total">
+        <span>Total</span>
+        <strong id="cartFinalTotal">R$ 0,00</strong>
+      </div>
+
+      <button class="btn btn-glow checkout-button" onclick="openCheckoutModal()">Finalizar Pedido →</button>
+    </div>
+  </aside>
+
+  <!-- Finalização do pedido -->
+  <div class="modal-backdrop" id="checkoutModal">
+    <div class="modal-window">
+      <button class="icon-btn modal-close" onclick="closeModal()">✕</button>
+
+      <h2 class="checkout-title">Finalizar Pedido 🚀</h2>
+      <p class="checkout-description">Informe o endereço para a entrega rápida.</p>
+
+      <form id="checkoutForm" onsubmit="handlePlaceOrder(event)">
+        <div class="form-group">
+          <label>Seu Nome *</label>
+          <input type="text" class="form-input" name="name" required placeholder="Ex: Felipe Ramos">
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp / Telefone *</label>
+          <input type="tel" class="form-input" name="phone" required placeholder="(11) 98765-4321">
+        </div>
+
+        <div class="address-grid">
+          <div class="form-group">
+            <label>CEP (Busca Automática) 📍</label>
+            <input type="text" class="form-input" id="inputCep" name="cep" placeholder="00000-000" maxlength="9" oninput="buscarCepAutomatico(this.value)">
+          </div>
+
+          <div class="form-group">
+            <label>Bairro *</label>
+            <input type="text" class="form-input" id="inputNeighborhood" name="neighborhood" required placeholder="Bela Vista">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Endereço e Número de Entrega *</label>
+          <input type="text" class="form-input" id="inputAddress" name="address" required placeholder="Ex: Av. Paulista, 1000 - Apto 42">
+        </div>
+
+        <div class="form-group">
+          <label>Forma de Pagamento *</label>
+          <select class="form-input" id="paymentMethodSelect" name="payment" required>
+            <option value="pix">⚡ Pix</option>
+            <option value="cartao">💳 Cartão de Crédito / Débito na Entrega</option>
+            <option value="dinheiro">💵 Dinheiro na Entrega</option>
+          </select>
+        </div>
+
+        <div class="checkout-total-box">
+          <span>Total a pagar:</span>
+          <strong id="modalCheckoutTotal">R$ 0,00</strong>
+        </div>
+
+        <div class="checkout-actions">
+          <button type="submit" class="btn btn-glow">🚀 Confirmar Pedido</button>
+          <button type="button" class="btn whatsapp-button" onclick="sendToWhatsAppDirectly()">💬 Enviar para o WhatsApp do Restaurante</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Acompanhamento do pedido -->
+  <div class="modal-backdrop" id="trackingModal">
+    <div class="modal-window tracking-window">
+      <button class="icon-btn modal-close" onclick="closeTrackingModal()">✕</button>
+
+      <div class="tracking-emoji">🛵</div>
+      <h2>Pedido Confirmado!</h2>
+      <p class="tracking-description">Acompanhando em tempo real: <strong id="trackingCode">#0000</strong></p>
+
+      <div id="pixAreaContainer" class="pix-box">
+        <strong class="pix-heading">⚡ PAGAMENTO VIA PIX</strong>
+        <p class="pix-warning">Este site é uma demonstração. Configure uma chave Pix real e uma integração de pagamento antes de receber pagamentos.</p>
+      </div>
+
+      <div class="gps-map-box">
+        <div class="gps-label">📍 ROTA GPS EM TEMPO REAL</div>
+        <div class="scooter-animation">🛵💨</div>
+      </div>
+
+      <div class="tracking-status-box">
+        <div class="tracking-status-row">
+          <strong>Status do Pedido:</strong>
+          <span>Em preparação na cozinha</span>
+        </div>
+        <p>Tempo estimado para chegada: <strong>22 minutos</strong></p>
+      </div>
+
+      <button class="btn btn-glow tracking-finish-button" onclick="closeTrackingModal()">Perfeito! Concluir</button>
+    </div>
+  </div>
+
+  <!-- Histórico de pedidos -->
+  <div class="modal-backdrop" id="ordersModal">
+    <div class="modal-window">
+      <button class="icon-btn modal-close" onclick="closeOrdersModal()">✕</button>
+      <h2 class="orders-title">Histórico de Pedidos 📋</h2>
+      <p class="orders-description">Seus pedidos gravados neste dispositivo.</p>
+      <div id="ordersListContainer" class="orders-list"></div>
+    </div>
+  </div>
+
+  <div class="toast-pill" id="toastPill">
+    <span id="toastIcon">✨</span>
+    <span id="toastMessage">Mensagem</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
